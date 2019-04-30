@@ -1,0 +1,172 @@
+---
+output: html_document
+classoption: landscape
+fontsize: 8pt
+geometry: margin = 1.5cm
+header-includes:  
+  - \usepackage{multicol}
+  - \pagenumbering{gobble}
+  - \usepackage[utf8]{inputenc}
+---
+
+```{r load_libraries, echo = FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(knitr)
+library(data.table)
+library(forecast)
+```
+
+```{r read_data, echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE}
+train <- read_csv('../1C_EDA/sales_train.csv')
+item_categories <- read_csv('../1C_EDA/item_categories.csv')
+items <- read_csv('../1C_EDA/items.csv')
+shops <- read_csv('../1C_EDA/shops.csv')
+```
+
+
+### The purpose of this kaggle competition https://www.kaggle.com/c/competitive-data-science-predict-future-sales/overview/evaluation is to create a time series to predict daily sales for each product and store for a Russian based software firm - 1C company. Below we have a exploratory data analysis.  
+
+First we want to take a look at the type of data we are working with for this analysis. Below is a sample of 5 observations where we have the date, date block, shop id, item id, item price, and how many items were sold at that shop that day.  
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE}
+train <- train %>%
+  mutate(date = dmy(date))
+
+kable(train %>%
+        sample_n(5))
+```
+
+### Summary statistics for our data.  
+```{r echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE}
+kable(summary(train))
+```
+
+* The dates for these data range from **Jan 1 2013** to **Oct 10 2015.**
+* There are **60** shops where the store id goes from **0 - 59.**
+* There are **22,170** different items for sale that range from **0 - 22,169.**
+* The item price varies from **-1(maybe incorrect) to 307,980** with an average sale price of **890.9.**
+* The number of specific items sold in a day range from **-22 (22 returns) to 2169** units sold.  
+  
+### Number of observations in our data. 
+```{r echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE}
+kable(nrow(train), col.names = 'Number of Rows', format.args = list(big.mark = ","))
+```
+* We have 2,935,849 rows in our dataset.  
+
+\newpage
+### In total there are 60 stores that are run by 1C company. What are the top stores in terms of overall sales?  
+```{r echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE}
+train %>%
+  mutate(item_sales = item_price * item_cnt_day) %>%
+  group_by(shop_id) %>%
+  summarize(shop_sales = sum(item_sales)) %>%
+  ggplot(aes(x = reorder(factor(shop_id), shop_sales), y = shop_sales, fill = factor(shop_id))) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  scale_fill_discrete(guide = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(x = 'Store ID', y = 'Shop Total Sales')
+
+```
+
+* The average store appears to have around 50,000,000 in sales. 
+* Store 31 had the highest sales of all 60 stores.
+* Stores 31 and 25 have almost 4 times the sales of the average store. (200,000,000 vs 50,000,000)
+
+### Do what days of the week people are shopping?  
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE}
+train %>%
+  mutate(item_sales = item_price * item_cnt_day,
+         doy = lubridate::wday(date)) %>%
+  group_by(doy) %>%
+  summarize(sales = sum(item_sales)) %>%
+  mutate(doy = if_else(doy == 1, 'Sunday',
+                       if_else(doy == 2, 'Monday',
+                               if_else(doy == 3, 'Tuesday',
+                                       if_else(doy == 4, 'Wednesday',
+                                               if_else(doy == 5, 'Thursday',
+                                                       if_else(doy == 6, 'Friday', 'Saturday'))))))) %>%
+  ggplot(aes(x = reorder(doy, sales), y = sales, fill = doy)) +
+  geom_bar(stat = 'identity') +
+  coord_flip() +
+  scale_fill_discrete(guide = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(x = 'Day of Week', y = 'Total Sales')
+
+```
+
+* The highest sales occur for 1C on the weekends with the busiest day being Saturday. 
+* Monday is the slowest day by a good margin.  
+
+### What are the top 10 categories of items being sold?
+```{r echo = FALSE, message = FALSE, warning = FALSE, out.width='85%'}
+include_graphics('/Users/joshuayoung88/Documents/cb/sales/sales.png')
+```
+
+* For 1C it appears that movies and video games are the biggest in terms of units sold.
+
+### What are the top 10 categories for dollars made on items sold?
+```{r echo = FALSE, message = FALSE, warning = FALSE, out.width='85%'}
+include_graphics('/Users/joshuayoung88/Documents/cb/sales/sales_1.png')
+```
+
+* For dollar amounts, video games take the cake with the to 5 sales being video game products.  
+* This makes sense as video games are higher dollar when compared to video games, but had similar units sold. 
+
+### Time series for all 60 stores  
+```{r echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE, fig.width=10, fig.height= 6.2}
+train %>%
+  group_by(shop_id, date) %>%
+  summarize(sales = sum(item_price)) %>%
+  ggplot(aes(x = date, y = sales)) +
+  geom_line() +
+  facet_wrap(~shop_id) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+  
+* There is a lot going on in these charts. These show all 60 stores and their sales every day between 2013 and 2015.
+* The big take away from this graph is that some of the stores were not open for the whole time period (maybe closed down, maybe not reporting numbers)
+* Stores 0, 1, 8, 23, and 32 apper to have shut down early 2013. 
+* Stores 34, 36, 39, 48 and 49 appear not to have opened until after the inital date. 
+
+### Let's zoom in and take a look at one store, here are sales per day for store 31  
+```{r echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE, fig.width = 10}
+train %>%
+  filter(shop_id == 31) %>%
+  group_by(date) %>%
+  summarize(sales = sum(item_price)) %>%
+  ggplot(aes(x = date, y = sales)) +
+  geom_point(size = 0.5) +
+  geom_line() +
+  scale_y_continuous(label = scales::comma) +
+  labs(x = 'Date', y = 'Sales', title = 'Sales Per Day for Store 31') +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+* For store 31, at the end of year time sales almost triple the average for the rest of the year.  
+
+\newpage  
+### Predicting sales for the next 200 days.
+```{r echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE, fig.width = 10, fig.height= 6.2}
+shop_31 <- train %>%
+  filter(shop_id == 31) %>%
+  group_by(date) %>%
+  summarize(sales = sum(item_price)) %>%
+  arrange(date) %>%
+  filter(date < lubridate::ymd('2015-06-30'))
+
+ts_data <- ts(shop_31$sales, start = c(2013, 1, 2), frequency = 365)
+
+autoplot(ts_data) + geom_forecast(h=200) +
+  labs(x = 'Date', y = 'Daily Sales', title = 'Time Series Predictions for Daily Sales', subtitle = 'With 95% Confidence Bands') +
+  scale_y_continuous(labels = scales::comma) +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+* We predicted total daily sales for the next 200 days using the ARIMA model. 
+* This model takes into account seasonality for our increased sales at the end of the year. 
+* We have a 95% confidence band around our predictions. 

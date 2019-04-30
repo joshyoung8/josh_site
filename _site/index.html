@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title></title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+
+</div>
+
+
+<div id="the-purpose-of-this-kaggle-competition-httpswww.kaggle.comccompetitive-data-science-predict-future-salesoverviewevaluation-is-to-create-a-time-series-to-predict-daily-sales-for-each-product-and-store-for-a-russian-based-software-firm---1c-company.-below-we-have-a-exploratory-data-analysis." class="section level3">
+<h3>The purpose of this kaggle competition <a href="https://www.kaggle.com/c/competitive-data-science-predict-future-sales/overview/evaluation" class="uri">https://www.kaggle.com/c/competitive-data-science-predict-future-sales/overview/evaluation</a> is to create a time series to predict daily sales for each product and store for a Russian based software firm - 1C company. Below we have a exploratory data analysis.</h3>
+<p>First we want to take a look at the type of data we are working with for this analysis. Below is a sample of 5 observations where we have the date, date block, shop id, item id, item price, and how many items were sold at that shop that day.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">date</th>
+<th align="right">date_block_num</th>
+<th align="right">shop_id</th>
+<th align="right">item_id</th>
+<th align="right">item_price</th>
+<th align="right">item_cnt_day</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2013-12-11</td>
+<td align="right">11</td>
+<td align="right">50</td>
+<td align="right">2458</td>
+<td align="right">299</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">2013-05-21</td>
+<td align="right">4</td>
+<td align="right">35</td>
+<td align="right">7911</td>
+<td align="right">899</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">2013-02-04</td>
+<td align="right">1</td>
+<td align="right">54</td>
+<td align="right">18633</td>
+<td align="right">399</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">2014-05-05</td>
+<td align="right">16</td>
+<td align="right">44</td>
+<td align="right">1305</td>
+<td align="right">299</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">2013-01-03</td>
+<td align="right">0</td>
+<td align="right">53</td>
+<td align="right">2252</td>
+<td align="right">599</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="summary-statistics-for-our-data." class="section level3">
+<h3>Summary statistics for our data.</h3>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="center">date</th>
+<th align="left">date_block_num</th>
+<th align="center">shop_id</th>
+<th align="center">item_id</th>
+<th align="center">item_price</th>
+<th align="center">item_cnt_day</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td align="center">Min. :2013-01-01</td>
+<td align="left">Min. : 0.00</td>
+<td align="center">Min. : 0</td>
+<td align="center">Min. : 0</td>
+<td align="center">Min. : -1.0</td>
+<td align="center">Min. : -22.000</td>
+</tr>
+<tr class="even">
+<td></td>
+<td align="center">1st Qu.:2013-08-01</td>
+<td align="left">1st Qu.: 7.00</td>
+<td align="center">1st Qu.:22</td>
+<td align="center">1st Qu.: 4476</td>
+<td align="center">1st Qu.: 249.0</td>
+<td align="center">1st Qu.: 1.000</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td align="center">Median :2014-03-04</td>
+<td align="left">Median :14.00</td>
+<td align="center">Median :31</td>
+<td align="center">Median : 9343</td>
+<td align="center">Median : 399.0</td>
+<td align="center">Median : 1.000</td>
+</tr>
+<tr class="even">
+<td></td>
+<td align="center">Mean :2014-04-03</td>
+<td align="left">Mean :14.57</td>
+<td align="center">Mean :33</td>
+<td align="center">Mean :10197</td>
+<td align="center">Mean : 890.9</td>
+<td align="center">Mean : 1.243</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td align="center">3rd Qu.:2014-12-05</td>
+<td align="left">3rd Qu.:23.00</td>
+<td align="center">3rd Qu.:47</td>
+<td align="center">3rd Qu.:15684</td>
+<td align="center">3rd Qu.: 999.0</td>
+<td align="center">3rd Qu.: 1.000</td>
+</tr>
+<tr class="even">
+<td></td>
+<td align="center">Max. :2015-10-31</td>
+<td align="left">Max. :33.00</td>
+<td align="center">Max. :59</td>
+<td align="center">Max. :22169</td>
+<td align="center">Max. :307980.0</td>
+<td align="center">Max. :2169.000</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The dates for these data range from <strong>Jan 1 2013</strong> to <strong>Oct 10 2015.</strong></li>
+<li>There are <strong>60</strong> shops where the store id goes from <strong>0 - 59.</strong></li>
+<li>There are <strong>22,170</strong> different items for sale that range from <strong>0 - 22,169.</strong></li>
+<li>The item price varies from <strong>-1(maybe incorrect) to 307,980</strong> with an average sale price of <strong>890.9.</strong></li>
+<li>The number of specific items sold in a day range from <strong>-22 (22 returns) to 2169</strong> units sold.</li>
+</ul>
+</div>
+<div id="number-of-observations-in-our-data." class="section level3">
+<h3>Number of observations in our data.</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Number of Rows</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2,935,849</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>We have 2,935,849 rows in our dataset.</li>
+</ul>
+
+</div>
+<div id="in-total-there-are-60-stores-that-are-run-by-1c-company.-what-are-the-top-stores-in-terms-of-overall-sales" class="section level3">
+<h3>In total there are 60 stores that are run by 1C company. What are the top stores in terms of overall sales?</h3>
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<ul>
+<li>The average store appears to have around 50,000,000 in sales.</li>
+<li>Store 31 had the highest sales of all 60 stores.</li>
+<li>Stores 31 and 25 have almost 4 times the sales of the average store. (200,000,000 vs 50,000,000)</li>
+</ul>
+</div>
+<div id="do-what-days-of-the-week-people-are-shopping" class="section level3">
+<h3>Do what days of the week people are shopping?</h3>
+<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<ul>
+<li>The highest sales occur for 1C on the weekends with the busiest day being Saturday.</li>
+<li>Monday is the slowest day by a good margin.</li>
+</ul>
+</div>
+<div id="what-are-the-top-10-categories-of-items-being-sold" class="section level3">
+<h3>What are the top 10 categories of items being sold?</h3>
+<p><img src="/Users/joshuayoung88/Documents/cb/sales/sales.png" width="85%" /></p>
+<ul>
+<li>For 1C it appears that movies and video games are the biggest in terms of units sold.</li>
+</ul>
+</div>
+<div id="what-are-the-top-10-categories-for-dollars-made-on-items-sold" class="section level3">
+<h3>What are the top 10 categories for dollars made on items sold?</h3>
+<p><img src="/Users/joshuayoung88/Documents/cb/sales/sales_1.png" width="85%" /></p>
+<ul>
+<li>For dollar amounts, video games take the cake with the to 5 sales being video game products.<br />
+</li>
+<li>This makes sense as video games are higher dollar when compared to video games, but had similar units sold.</li>
+</ul>
+</div>
+<div id="time-series-for-all-60-stores" class="section level3">
+<h3>Time series for all 60 stores</h3>
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
+<ul>
+<li>There is a lot going on in these charts. These show all 60 stores and their sales every day between 2013 and 2015.</li>
+<li>The big take away from this graph is that some of the stores were not open for the whole time period (maybe closed down, maybe not reporting numbers)</li>
+<li>Stores 0, 1, 8, 23, and 32 apper to have shut down early 2013.</li>
+<li>Stores 34, 36, 39, 48 and 49 appear not to have opened until after the inital date.</li>
+</ul>
+</div>
+<div id="lets-zoom-in-and-take-a-look-at-one-store-here-are-sales-per-day-for-store-31" class="section level3">
+<h3>Let’s zoom in and take a look at one store, here are sales per day for store 31</h3>
+<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" width="960" /></p>
+<ul>
+<li>For store 31, at the end of year time sales almost triple the average for the rest of the year.</li>
+</ul>
+
+</div>
+<div id="predicting-sales-for-the-next-200-days." class="section level3">
+<h3>Predicting sales for the next 200 days.</h3>
+<p><img src="index_files/figure-html/unnamed-chunk-10-1.png" width="960" /></p>
+<ul>
+<li>We predicted total daily sales for the next 200 days using the ARIMA model.</li>
+<li>This model takes into account seasonality for our increased sales at the end of the year.</li>
+<li>We have a 95% confidence band around our predictions.</li>
+</ul>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
